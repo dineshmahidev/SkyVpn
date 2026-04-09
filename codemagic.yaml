@@ -4,29 +4,21 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m1
     environment:
-      node: 18 # Switched to 18 for better Expo compatibility
+      node: 18
       java: 17
     scripts:
       - name: Install dependencies
         script: npm install
-      - name: Cleanup previous builds
+      - name: Install EAS CLI
+        script: npm install -g eas-cli
+      - name: Build Android APK (Local EAS)
         script: |
-          rm -rf android
-          npm cache clean --force
-      - name: Expo Prebuild
-        script: |
-          npx expo install --check
-          npx expo prebuild --platform android --no-install
-      - name: Build Android APK
-        script: |
-          export NODE_OPTIONS="--max-old-space-size=8192"
-          # Forcing Kotlin version and memory limits
-          export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx4096m -Dkotlin.version=1.9.24"
-          cd android
-          chmod +x gradlew
-          ./gradlew clean assembleDebug --no-daemon --stacktrace
+          # This command uses Expo's official build engine on the Codemagic machine
+          # --local means it doesn't use Expo's cloud credits
+          npx eas-cli build --local --platform android --profile preview --non-interactive
     artifacts:
-      - android/app/build/outputs/apk/debug/*.apk
+      - build/*.apk
+      - "*.apk"
     publishing:
       email:
         recipients:
