@@ -2,9 +2,8 @@ workflows:
   android-debug:
     name: SkyVPN Debug Build
     max_build_duration: 60
-    instance_type: linux
     environment:
-      node: 18.20.4
+      node: 18
     triggering:
       events:
         - push
@@ -24,9 +23,8 @@ workflows:
   android-release:
     name: SkyVPN Release APK
     max_build_duration: 60
-    instance_type: linux
     environment:
-      node: 18.20.4
+      node: 18
     triggering:
       events:
         - push
