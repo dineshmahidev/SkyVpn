@@ -1,0 +1,42 @@
+workflows:
+  android-debug:
+    name: SkyVPN Debug Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      node: 18.x
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: '*' # Build debug on every push to any branch
+          include: true
+        - pattern: 'main' # Exclude main from debug if you want
+          include: false
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build Debug APK
+        script: npx eas-cli build --platform android --profile development --non-interactive
+    artifacts:
+      - build/*.apk
+
+  android-release:
+    name: SkyVPN Release APK
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    environment:
+      node: 18.x
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+    scripts:
+      - name: Install dependencies
+        script: npm install
+      - name: Build Release APK
+        script: npx eas-cli build --platform android --profile preview --non-interactive
+    artifacts:
+      - build/*.apk
