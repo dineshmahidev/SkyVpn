@@ -10,20 +10,21 @@ workflows:
       - name: Install dependencies
         script: npm install
       - name: Cleanup previous builds
-        script: |
-          rm -rf android
-          # rm -rf node_modules # Optional: Uncomment if dependencies acting strange
+        script: rm -rf android
       - name: Expo Prebuild
-        script: npx expo prebuild --platform android --no-install
+        script: |
+          npx expo install --check
+          npx expo prebuild --platform android --no-install
       - name: Build Android APK
         script: |
           export NODE_OPTIONS="--max-old-space-size=8192"
           export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m"
           cd android
           chmod +x gradlew
-          ./gradlew clean assembleRelease --no-daemon --info --stacktrace
+          # Changed to assembleDebug to avoid signing errors
+          ./gradlew clean assembleDebug --no-daemon --info --stacktrace
     artifacts:
-      - android/app/build/outputs/apk/release/*.apk
+      - android/app/build/outputs/apk/debug/*.apk
     publishing:
       email:
         recipients:
