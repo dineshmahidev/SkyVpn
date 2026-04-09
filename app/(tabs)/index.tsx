@@ -70,7 +70,7 @@ export default function HomeScreen() {
       <View style={[styles.stickyHeader, { paddingTop: Math.max(insets.top, Spacing.md) }]}>
         <View style={styles.headerTitleRow}>
           <Image 
-            source={require('../../assets/images/logo.png')} 
+            source={require('../../assets/images/icon_primary.png')} 
             style={styles.headerLogo}
             resizeMode="contain"
           />
