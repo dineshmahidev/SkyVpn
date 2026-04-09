@@ -1,25 +1,35 @@
 workflows:
-  android-native-build:
-    name: SkyVPN Native APK Build
+  skyvpn-android-build:
+    name: SkyVPN Android Release Build
     max_build_duration: 60
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     environment:
-      node: 18
+      node: 20
       java: 17
+      # IMPORTANT: Define these in Codemagic UI for Code Signing
+      # groups:
+      #   - keystore_credentials
     scripts:
       - name: Install dependencies
-        script: npm install
-      - name: Install EAS CLI
-        script: npm install -g eas-cli
-      - name: Build Android APK (Local EAS)
         script: |
-          # This command uses Expo's official build engine on the Codemagic machine
-          # --local means it doesn't use Expo's cloud credits
-          npx eas-cli build --local --platform android --profile preview --non-interactive
+          npm install
+          npx expo install --fix
+      - name: Expo Prebuild
+        script: |
+          npx expo prebuild --platform android --no-install --non-interactive
+      - name: Build Android Release APK
+        script: |
+          export NODE_OPTIONS="--max-old-space-size=8192"
+          cd android
+          chmod +x gradlew
+          # Changed to Release
+          ./gradlew assembleRelease --no-daemon
     artifacts:
-      - build/*.apk
-      - "*.apk"
+      - android/app/build/outputs/apk/release/*.apk
     publishing:
       email:
         recipients:
           - dineshwebdev2003@gmail.com
+        notify:
+          success: true
+          failure: true
