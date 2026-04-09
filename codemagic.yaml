@@ -2,16 +2,16 @@ workflows:
   android-debug:
     name: SkyVPN Debug Build
     max_build_duration: 60
-    instance_type: mac_mini_m1
+    instance_type: linux
     environment:
-      node: 18.x
+      node: 18.20.4
     triggering:
       events:
         - push
       branch_patterns:
-        - pattern: '*' # Build debug on every push to any branch
+        - pattern: '*'
           include: true
-        - pattern: 'main' # Exclude main from debug if you want
+        - pattern: 'main'
           include: false
     scripts:
       - name: Install dependencies
@@ -24,9 +24,9 @@ workflows:
   android-release:
     name: SkyVPN Release APK
     max_build_duration: 60
-    instance_type: mac_mini_m1
+    instance_type: linux
     environment:
-      node: 18.x
+      node: 18.20.4
     triggering:
       events:
         - push
