@@ -1,30 +1,12 @@
 workflows:
-  android-debug:
-    name: SkyVPN Debug Build
+  android-native-build:
+    name: SkyVPN Native APK Build
     max_build_duration: 60
+    instance_type: mac_mini_m1
     environment:
-      node: 18
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: '*'
-          include: true
-        - pattern: 'main'
-          include: false
-    scripts:
-      - name: Install dependencies
-        script: npm install
-      - name: Build Debug APK
-        script: npx eas-cli build --platform android --profile development --non-interactive
-    artifacts:
-      - build/*.apk
-
-  android-release:
-    name: SkyVPN Release APK
-    max_build_duration: 60
-    environment:
-      node: 18
+      node: 20
+      java: 17
+    # working_directory: . # Project is in root
     triggering:
       events:
         - push
@@ -34,7 +16,22 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm install
-      - name: Build Release APK
-        script: npx eas-cli build --platform android --profile preview --non-interactive
+      - name: Cleanup previous builds
+        script: rm -rf android
+      # - name: Create google-services.json (Add this back if you use Firebase)
+      #   script: |
+      #     echo $GOOGLE_SERVICES_JSON | base64 --decode > google-services.json
+      - name: Expo Prebuild
+        script: npx expo prebuild --platform android --no-install
+      - name: Build Android APK
+        script: |
+          export NODE_OPTIONS="--max-old-space-size=8192"
+          cd android
+          chmod +x gradlew
+          ./gradlew clean assembleRelease --no-daemon --stacktrace
     artifacts:
-      - build/*.apk
+      - android/app/build/outputs/apk/release/*.apk
+    publishing:
+      email:
+        recipients:
+          - dineshwebdev2003@gmail.com
