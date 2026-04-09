@@ -4,13 +4,15 @@ workflows:
     max_build_duration: 60
     instance_type: mac_mini_m1
     environment:
-      node: 20
+      node: 18 # Switched to 18 for better Expo compatibility
       java: 17
     scripts:
       - name: Install dependencies
         script: npm install
       - name: Cleanup previous builds
-        script: rm -rf android
+        script: |
+          rm -rf android
+          npm cache clean --force
       - name: Expo Prebuild
         script: |
           npx expo install --check
@@ -18,11 +20,11 @@ workflows:
       - name: Build Android APK
         script: |
           export NODE_OPTIONS="--max-old-space-size=8192"
-          export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m"
+          # Forcing Kotlin version and memory limits
+          export GRADLE_OPTS="-Dorg.gradle.jvmargs=-Xmx4096m -Dkotlin.version=1.9.24"
           cd android
           chmod +x gradlew
-          # Changed to assembleDebug to avoid signing errors
-          ./gradlew clean assembleDebug --no-daemon --info --stacktrace
+          ./gradlew clean assembleDebug --no-daemon --stacktrace
     artifacts:
       - android/app/build/outputs/apk/debug/*.apk
     publishing:
