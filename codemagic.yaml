@@ -15,24 +15,24 @@ workflows:
         script: |
           rm -rf android
           npx expo prebuild --platform android --no-install --non-interactive
-      - name: Fix Android Resource Compilation
+      - name: Force SDK 35 and Disable Crunching
         script: |
-          # 1. Disable PNG optimization (AAPT Fix)
+          # Force SDK 35 to avoid SDK 36 bugs
+          sed -i '' 's/compileSdkVersion = .*/compileSdkVersion = 35/' android/build.gradle
+          sed -i '' 's/targetSdkVersion = .*/targetSdkVersion = 35/' android/build.gradle
+          
+          # Disable PNG optimization (AAPT Fix)
           sed -i '' 's/android {/android { aaptOptions { cruncherEnabled = false } /' android/app/build.gradle
           
-          # 2. Tell Gradle to ignore individual resource failures and keep building
+          # Force legacy resource system
           echo "android.resource.compilation.enabled=false" >> android/gradle.properties
-          
-          # 3. Increase Gradle's memory to handle the complex asset bundles
-          echo "org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
+          echo "org.gradle.jvmargs=-Xmx6144m" >> android/gradle.properties
       - name: Build Android Release APK
         script: |
           export NODE_OPTIONS="--max-old-space-size=8192"
           cd android
           chmod +x gradlew
-          # Perform a hard clean before building
-          ./gradlew clean
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew clean assembleRelease --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
     publishing:

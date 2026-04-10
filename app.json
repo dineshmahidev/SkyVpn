@@ -14,9 +14,10 @@
     },
     "android": {
       "package": "com.dinesh.skyvpn",
+      "versionCode": 1,
+      "compileSdkVersion": 35,
+      "targetSdkVersion": 35,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon_fg.png",
-        "backgroundImage": "./assets/images/icon_bg.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
