@@ -6,9 +6,6 @@ workflows:
     environment:
       node: 20
       java: 17
-      # IMPORTANT: Define these in Codemagic UI for Code Signing
-      # groups:
-      #   - keystore_credentials
     scripts:
       - name: Install dependencies
         script: |
@@ -16,13 +13,17 @@ workflows:
           npx expo install --fix
       - name: Expo Prebuild
         script: |
+          rm -rf android
           npx expo prebuild --platform android --no-install --non-interactive
+      - name: Disable PNG Crunching (AAPT Fix)
+        script: |
+          # This magic line prevents the "AAPT: error: file failed to compile" by disabling PNG optimization
+          sed -i '' 's/android {/android { aaptOptions { cruncherEnabled = false } /' android/app/build.gradle
       - name: Build Android Release APK
         script: |
           export NODE_OPTIONS="--max-old-space-size=8192"
           cd android
           chmod +x gradlew
-          # Changed to Release
           ./gradlew assembleRelease --no-daemon
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
