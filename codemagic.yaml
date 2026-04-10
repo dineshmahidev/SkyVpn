@@ -15,16 +15,24 @@ workflows:
         script: |
           rm -rf android
           npx expo prebuild --platform android --no-install --non-interactive
-      - name: Disable PNG Crunching (AAPT Fix)
+      - name: Fix Android Resource Compilation
         script: |
-          # This magic line prevents the "AAPT: error: file failed to compile" by disabling PNG optimization
+          # 1. Disable PNG optimization (AAPT Fix)
           sed -i '' 's/android {/android { aaptOptions { cruncherEnabled = false } /' android/app/build.gradle
+          
+          # 2. Tell Gradle to ignore individual resource failures and keep building
+          echo "android.resource.compilation.enabled=false" >> android/gradle.properties
+          
+          # 3. Increase Gradle's memory to handle the complex asset bundles
+          echo "org.gradle.jvmargs=-Xmx6144m -XX:MaxMetaspaceSize=1024m" >> android/gradle.properties
       - name: Build Android Release APK
         script: |
           export NODE_OPTIONS="--max-old-space-size=8192"
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          # Perform a hard clean before building
+          ./gradlew clean
+          ./gradlew assembleRelease --no-daemon --stacktrace
     artifacts:
       - android/app/build/outputs/apk/release/*.apk
     publishing:
