@@ -4,7 +4,7 @@
     "slug": "vpn",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon_primary.png",
+    "icon": "./assets/images/icon_fg.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,10 +15,9 @@
     "android": {
       "package": "com.dinesh.skyvpn",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/icon_primary.png",
-        "backgroundImage": "./assets/images/icon_primary.png",
-        "monochromeImage": "./assets/images/icon_primary.png"
+        "foregroundImage": "./assets/images/icon_fg.png",
+        "backgroundImage": "./assets/images/icon_bg.png",
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
